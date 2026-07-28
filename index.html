@@ -1210,6 +1210,24 @@ function tick(){
 tick();
 setInterval(tick, 1000);
 
+/* ---- HERO VIDEO AUTOPLAY FALLBACK ---- */
+/* Algunos navegadores móviles (WhatsApp/Instagram in-app, ahorro de datos, etc.)
+   bloquean el autoplay aunque el video esté muted. Forzamos play() al cargar
+   y, si falla, lo reintentamos en la primera interacción del usuario. */
+(function(){
+  const heroVideo = document.getElementById('hero-video');
+  if(!heroVideo) return;
+  heroVideo.muted = true;
+  function tryPlay(){
+    const p = heroVideo.play();
+    if(p && p.catch) p.catch(function(){});
+  }
+  tryPlay();
+  ['touchstart','click','scroll'].forEach(function(evt){
+    document.addEventListener(evt, tryPlay, { once:true, passive:true });
+  });
+})();
+
 /* ---- SCROLL REVEAL ---- */
 const revEls = document.querySelectorAll('.reveal');
 const revObs = new IntersectionObserver(entries => {
